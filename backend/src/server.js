@@ -11,6 +11,10 @@ import {
   verifyOnChain
 } from "./utils/blockchain.js";
 import { fetchRecentEvents } from "./utils/cloudtrail.js";
+import classifySeverity from "./utils/severity.js";
+
+import authRoutes from "./routes/auth.js";
+import { authorize } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -19,261 +23,386 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Authentication routes
+app.use("/api/auth", authRoutes);
+
 const PORT = process.env.PORT || 5000;
 
-// Health check
+
+// HEALTH CHECK - PUBLIC
+
+
 app.get("/", (req, res) => {
   res.json({
     message: "Cloud Resource Audit API is running"
   });
 });
 
-// Create audit event
-app.post("/api/events", async (req, res) => {
-  try {
-    const {
-      user,
-      action,
-      resource,
-      service,
-      severity
-    } = req.body;
+// CREATE AUDIT EVENT
+// Admin + Auditor only
+// Severity is automatically calculated
 
-    if (!user || !action || !resource || !service || !severity) {
-      return res.status(400).json({
-        message: "All event fields are required"
+app.post(
+  "/api/events",
+  authorize("admin", "auditor"),
+  async (req, res) => {
+    try {
+      const {
+        user,
+        action,
+        resource,
+        service
+      } = req.body;
+
+      if (!user || !action || !resource || !service) {
+        return res.status(400).json({
+          message: "All event fields are required"
+        });
+      }
+
+      // Automatically classify severity
+      const severity = classifySeverity(action, service);
+
+      const eventId = `EVT-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+
+      const eventData = {
+        user,
+        action,
+        resource,
+        service,
+        severity
+      };
+
+      // Generate SHA-256 hash
+      const hash = createEventHash(eventData);
+
+      // Record hash on blockchain
+      const blockchainTx = await recordOnChain(
+        eventId,
+        hash
+      );
+
+      // Save complete event in MongoDB
+      const event = await Event.create({
+        eventId,
+        user,
+        action,
+        resource,
+        service,
+        severity,
+        hash,
+        blockchainTx,
+        status: "PENDING"
+      });
+
+      res.status(201).json(event);
+
+    } catch (error) {
+      console.error(
+        "Create event error:",
+        error.message
+      );
+
+      res.status(500).json({
+        message: "Failed to create audit event",
+        error: error.message
       });
     }
-
-    const eventId = `EVT-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
-
-    const eventData = {
-      user,
-      action,
-      resource,
-      service,
-      severity
-    };
-
-    // Generate SHA-256 hash
-    const hash = createEventHash(eventData);
-
-    // Record hash on blockchain
-    const blockchainTx = await recordOnChain(eventId, hash);
-
-    // Save complete event in MongoDB
-    const event = await Event.create({
-      eventId,
-      user,
-      action,
-      resource,
-      service,
-      severity,
-      hash,
-      blockchainTx,
-      status: "PENDING"
-    });
-
-    res.status(201).json(event);
-
-  } catch (error) {
-    console.error("Create event error:", error.message);
-
-    res.status(500).json({
-      message: "Failed to create audit event",
-      error: error.message
-    });
   }
-});
+);
 
-// Get recent AWS CloudTrail events
-app.get("/api/cloudtrail/events", async (req, res) => {
-  try {
-    const events = await fetchRecentEvents();
+// GET RECENT AWS CLOUDTRAIL EVENTS
+// Admin + Auditor only
 
-    res.json({
-      count: events.length,
-      events
-    });
 
-  } catch (error) {
-    console.error("CloudTrail error:", error.message);
+app.get(
+  "/api/cloudtrail/events",
+  authorize("admin", "auditor"),
+  async (req, res) => {
+    try {
+      const events = await fetchRecentEvents();
 
-    res.status(500).json({
-      message: "Failed to fetch CloudTrail events",
-      error: error.message
-    });
-  }
-});
+      res.json({
+        count: events.length,
+        events
+      });
 
-// Import a CloudTrail CreateBucket event into the audit system
-app.post("/api/cloudtrail/import", async (req, res) => {
-  try {
-    const events = await fetchRecentEvents("CreateBucket");
+    } catch (error) {
+      console.error(
+        "CloudTrail error:",
+        error.message
+      );
 
-    // Find the most recent CreateBucket event
-    const cloudTrailEvent = events.find(
-      (event) => event.EventName === "CreateBucket"
-    );
-
-    if (!cloudTrailEvent) {
-      return res.status(404).json({
-        message: "No CreateBucket event found in recent CloudTrail events"
+      res.status(500).json({
+        message: "Failed to fetch CloudTrail events",
+        error: error.message
       });
     }
-
-    const resource =
-      cloudTrailEvent.Resources?.[0]?.ResourceName ||
-      "Unknown resource";
-
-    const eventId = `AWS-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
-
-    const eventData = {
-      user: cloudTrailEvent.Username || "Unknown user",
-      action: cloudTrailEvent.EventName,
-      resource,
-      service: cloudTrailEvent.EventSource || "AWS",
-      severity: "LOW"
-    };
-
-    // Generate SHA-256 hash
-    const hash = createEventHash(eventData);
-
-    // Record hash on blockchain
-    const blockchainTx = await recordOnChain(eventId, hash);
-
-    // Save complete event in MongoDB
-    const event = await Event.create({
-      eventId,
-      user: eventData.user,
-      action: eventData.action,
-      resource: eventData.resource,
-      service: eventData.service,
-      severity: eventData.severity,
-      hash,
-      blockchainTx,
-      status: "PENDING"
-    });
-
-    res.status(201).json({
-      message: "CloudTrail event imported successfully",
-      source: "AWS CloudTrail",
-      cloudTrailEvent,
-      auditEvent: event
-    });
-
-  } catch (error) {
-    console.error("CloudTrail import error:", error.message);
-
-    res.status(500).json({
-      message: "Failed to import CloudTrail event",
-      error: error.message
-    });
   }
-});
+);
 
-// Get all events
-app.get("/api/events", async (req, res) => {
-  try {
-    const events = await Event.find()
-      .sort({ createdAt: -1 });
+// IMPORT CLOUDTRAIL CREATEBUCKET EVENT
+// Admin + Auditor only
+// Severity is automatically calculated
 
-    res.json(events);
 
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch events",
-      error: error.message
-    });
-  }
-});
+app.post(
+  "/api/cloudtrail/import",
+  authorize("admin", "auditor"),
+  async (req, res) => {
+    try {
+      const events = await fetchRecentEvents(
+        "CreateBucket"
+      );
 
-// Verify event
-app.get("/api/events/:eventId/verify", async (req, res) => {
-  try {
-    const { eventId } = req.params;
+      // Find the most recent CreateBucket event
+      const cloudTrailEvent = events.find(
+        (event) =>
+          event.EventName === "CreateBucket"
+      );
 
-    const event = await Event.findOne({ eventId });
+      if (!cloudTrailEvent) {
+        return res.status(404).json({
+          message:
+            "No CreateBucket event found in recent CloudTrail events"
+        });
+      }
 
-    if (!event) {
-      return res.status(404).json({
-        message: "Event not found"
+      const resource =
+        cloudTrailEvent.Resources?.[0]?.ResourceName ||
+        "Unknown resource";
+
+      const eventId = `AWS-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+
+      const service =
+        cloudTrailEvent.EventSource || "AWS";
+
+      // Automatically classify CloudTrail event severity
+      const severity = classifySeverity(
+        cloudTrailEvent.EventName,
+        service
+      );
+
+      const eventData = {
+        user:
+          cloudTrailEvent.Username ||
+          "Unknown user",
+
+        action:
+          cloudTrailEvent.EventName,
+
+        resource,
+
+        service,
+
+        severity
+      };
+
+      // Generate SHA-256 hash
+      const hash = createEventHash(eventData);
+
+      // Record hash on blockchain
+      const blockchainTx =
+        await recordOnChain(
+          eventId,
+          hash
+        );
+
+      // Save complete event in MongoDB
+      const event = await Event.create({
+        eventId,
+        user: eventData.user,
+        action: eventData.action,
+        resource: eventData.resource,
+        service: eventData.service,
+        severity: eventData.severity,
+        hash,
+        blockchainTx,
+        status: "PENDING"
+      });
+
+      res.status(201).json({
+        message:
+          "CloudTrail event imported successfully",
+
+        source:
+          "AWS CloudTrail",
+
+        cloudTrailEvent,
+
+        auditEvent: event
+      });
+
+    } catch (error) {
+      console.error(
+        "CloudTrail import error:",
+        error.message
+      );
+
+      res.status(500).json({
+        message:
+          "Failed to import CloudTrail event",
+
+        error:
+          error.message
       });
     }
-
-    const currentHash = createEventHash({
-      user: event.user,
-      action: event.action,
-      resource: event.resource,
-      service: event.service,
-      severity: event.severity
-    });
-
-    const isValid = await verifyOnChain(
-      eventId,
-      currentHash
-    );
-
-    event.status = isValid ? "VERIFIED" : "TAMPERED";
-
-    await event.save();
-
-    res.json({
-      eventId,
-      currentHash,
-      originalHash: event.hash,
-      blockchainVerified: isValid,
-      status: event.status
-    });
-
-  } catch (error) {
-    console.error("Verification error:", error.message);
-
-    res.status(500).json({
-      message: "Verification failed",
-      error: error.message
-    });
   }
-});
+);
 
-// Statistics
-app.get("/api/stats", async (req, res) => {
-  try {
-    const total = await Event.countDocuments();
+// GET ALL EVENTS
+// Admin + Auditor + Viewer
 
-    const verified = await Event.countDocuments({
-      status: "VERIFIED"
-    });
+app.get(
+  "/api/events",
+  authorize(
+    "admin",
+    "auditor",
+    "viewer"
+  ),
+  async (req, res) => {
+    try {
+      const events = await Event.find()
+        .sort({ createdAt: -1 });
 
-    const tampered = await Event.countDocuments({
-      status: "TAMPERED"
-    });
+      res.json(events);
 
-    res.json({
-      total,
-      verified,
-      tampered
-    });
+    } catch (error) {
+      res.status(500).json({
+        message:
+          "Failed to fetch events",
 
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch statistics",
-      error: error.message
-    });
+        error:
+          error.message
+      });
+    }
   }
-});
+);
+// VERIFY EVENT
+// Admin + Auditor only
 
-// Start server
+app.get(
+  "/api/events/:eventId/verify",
+  authorize("admin", "auditor"),
+  async (req, res) => {
+    try {
+      const { eventId } = req.params;
+
+      const event =
+        await Event.findOne({ eventId });
+
+      if (!event) {
+        return res.status(404).json({
+          message:
+            "Event not found"
+        });
+      }
+
+      const currentHash =
+        createEventHash({
+          user: event.user,
+          action: event.action,
+          resource: event.resource,
+          service: event.service,
+          severity: event.severity
+        });
+
+      const isValid =
+        await verifyOnChain(
+          eventId,
+          currentHash
+        );
+
+      event.status =
+        isValid
+          ? "VERIFIED"
+          : "TAMPERED";
+
+      await event.save();
+
+      res.json({
+        eventId,
+        currentHash,
+        originalHash: event.hash,
+        blockchainVerified: isValid,
+        status: event.status
+      });
+
+    } catch (error) {
+      console.error(
+        "Verification error:",
+        error.message
+      );
+
+      res.status(500).json({
+        message:
+          "Verification failed",
+
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+// STATISTICS
+// Admin + Auditor + Viewer
+app.get(
+  "/api/stats",
+  authorize(
+    "admin",
+    "auditor",
+    "viewer"
+  ),
+  async (req, res) => {
+    try {
+      const total =
+        await Event.countDocuments();
+
+      const verified =
+        await Event.countDocuments({
+          status: "VERIFIED"
+        });
+
+      const tampered =
+        await Event.countDocuments({
+          status: "TAMPERED"
+        });
+
+      res.json({
+        total,
+        verified,
+        tampered
+      });
+
+    } catch (error) {
+      res.status(500).json({
+        message:
+          "Failed to fetch statistics",
+
+        error:
+          error.message
+      });
+    }
+  }
+);
+
+
 const startServer = async () => {
   try {
     await connectDB();
 
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(
+        `Server running on http://localhost:${PORT}`
+      );
     });
 
   } catch (error) {
-    console.error("Server startup failed:", error.message);
+    console.error(
+      "Server startup failed:",
+      error.message
+    );
   }
 };
 

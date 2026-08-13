@@ -206,8 +206,7 @@ The system processes CloudTrail events and converts them into structured audit r
 
 <div align="center">
 
-<img src="docs/screenshots/AWS-cloudtrail-event.png" alt="AWS CloudTrail Event" width="900">
-
+<img src="docs/screenshots/AWS-cloudtrail-event.png?v=2" alt="AWS CloudTrail Event" width="900">
 </div>
 
 ---

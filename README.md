@@ -99,3 +99,42 @@ Production-oriented cloud security architecture built using:
                     │
                     ▼
              ⚛️ React Dashboard
+
+# 🔥 Why This Project?
+
+Traditional audit records can be modified after they are stored.
+
+This project combines **cloud auditing, cryptographic hashing, database storage, and blockchain verification** to make cloud audit records tamper-evident.
+
+It demonstrates:
+
+- ☁️ Cloud Security Auditing
+- 🔐 Cryptographic Integrity
+- ⛓️ Blockchain Verification
+- 🚨 Tamper Detection
+- 🔑 Authentication & RBAC
+- 🐳 Containerized Deployment
+- 🤖 Continuous Integration
+
+---
+
+# 🧠 Audit Workflow
+
+```text
+Cloud Activity
+      ↓
+AWS CloudTrail Event
+      ↓
+Severity Classification
+      ↓
+SHA-256 Hash
+      ↓
+MongoDB + Blockchain
+      ↓
+Hash Verification
+      ↓
+┌──────────────────────────┐
+│ Match    → ✅ VERIFIED   │
+│ Mismatch → ⚠️ TAMPERED  │
+└──────────────────────────┘
+

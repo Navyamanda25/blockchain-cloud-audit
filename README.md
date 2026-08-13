@@ -100,6 +100,7 @@ Production-oriented cloud security architecture built using:
                     ▼
         ⚛️ React Dashboard
 ---
+
 # 🔥 Why This Project?
 
 Traditional audit records can be modified after they are stored.
@@ -133,6 +134,10 @@ MongoDB + Blockchain
       ↓
 Hash Verification
       ↓
+┌──────────────────────────┐
+│ Match    → ✅ VERIFIED   │
+│ Mismatch → ⚠️ TAMPERED  │
+└──────────────────────────┘
 ┌──────────────────────────┐
 │ Match    → ✅ VERIFIED   │
 │ Mismatch → ⚠️ TAMPERED  │

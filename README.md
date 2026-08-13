@@ -10,31 +10,63 @@
 
 
 
-A cloud security auditing platform that captures AWS CloudTrail activity, generates cryptographic integrity proofs, stores audit records in MongoDB, and verifies record integrity using blockchain.
+<p>
+
+A cloud security auditing platform that captures AWS CloudTrail activity,
+
+generates cryptographic integrity proofs, stores audit records in MongoDB,
+
+and verifies record integrity using blockchain.
+
+</p>
 
 
 
-<br>
+<p>
+
+<img src="https://img.shields.io/badge/AWS-CloudTrail-orange">
+
+<img src="https://img.shields.io/badge/Node.js-20-green">
+
+<img src="https://img.shields.io/badge/Express.js-Backend-black">
+
+<img src="https://img.shields.io/badge/React-Frontend-blue">
+
+<img src="https://img.shields.io/badge/MongoDB-Atlas-green">
+
+<img src="https://img.shields.io/badge/Solidity-Smart%20Contract-gray">
+
+<img src="https://img.shields.io/badge/Hardhat-Blockchain-yellow">
+
+<img src="https://img.shields.io/badge/Docker-Containerized-blue">
+
+<img src="https://img.shields.io/badge/GitHub%20Actions-CI-black">
+
+</p>
 
 
 
-!\[AWS](https://img.shields.io/badge/AWS-CloudTrail-orange)
+<hr>
 
-!\[Node.js](https://img.shields.io/badge/Node.js-20-green)
 
-!\[Express](https://img.shields.io/badge/Express.js-Backend-black)
 
-!\[React](https://img.shields.io/badge/React-Frontend-blue)
+\### ⚡ Cloud Activity → Audit → Integrity Proof → Verification
 
-!\[MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
 
-!\[Solidity](https://img.shields.io/badge/Solidity-Smart%20Contract-gray)
 
-!\[Hardhat](https://img.shields.io/badge/Hardhat-Blockchain-yellow)
+<p>
 
-!\[Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+Production-oriented cloud security architecture built using:
 
-!\[GitHub%20Actions](https://img.shields.io/badge/GitHub%20Actions-CI-black)
+</p>
+
+
+
+<p>
+
+☁️ AWS CloudTrail • 🔐 SHA-256 • 🗄️ MongoDB • ⛓️ Solidity • 🐳 Docker • 🤖 GitHub Actions • ⚛️ React
+
+</p>
 
 
 
@@ -240,19 +272,7 @@ Later, the system can verify whether the MongoDB audit record has been modified.
 
 &#x20;             └──────────────────┘
 
-```
-
-
-
-\---
-
-
-
-\# 🔄 How It Works
-
-
-
-```text
+🔄 How It Works
 
 Cloud Activity
 
@@ -306,31 +326,21 @@ Audit Record               Integrity Proof
 
 &#x20;  ✅ VERIFIED    ⚠️ TAMPERED
 
-```
+🔐 Authentication \& RBAC
 
 
 
-\---
+The backend uses JWT authentication and role-based authorization.
 
 
 
-\# 🔐 Authentication \& RBAC
+Role	Access
 
+Admin	Full audit management
 
+Auditor	Create, import and verify audit events
 
-The backend uses \*\*JWT authentication\*\* and role-based authorization.
-
-
-
-| Role | Access |
-
-|---|---|
-
-| \*\*Admin\*\* | Full audit management |
-
-| \*\*Auditor\*\* | Create, import and verify audit events |
-
-| \*\*Viewer\*\* | View events and statistics |
+Viewer	View events and statistics
 
 
 
@@ -338,19 +348,13 @@ Protected API routes ensure that users can perform actions according to their as
 
 
 
-\---
-
-
-
-\# 🚨 Event Severity Classification
+🚨 Event Severity Classification
 
 
 
 Audit events are classified into four severity levels:
 
 
-
-```text
 
 LOW
 
@@ -360,15 +364,11 @@ HIGH
 
 CRITICAL
 
-```
-
 
 
 Examples:
 
 
-
-```text
 
 CreateBucket → LOW
 
@@ -376,27 +376,19 @@ DeleteBucket → HIGH
 
 CreateUser   → CRITICAL
 
-```
-
 
 
 Severity classification helps prioritize potentially sensitive cloud activity.
 
 
 
-\---
+🔑 SHA-256 Integrity Protection
 
 
 
-\# 🔑 SHA-256 Integrity Protection
+Each audit event is processed using SHA-256 cryptographic hashing.
 
 
-
-Each audit event is processed using \*\*SHA-256 cryptographic hashing\*\*.
-
-
-
-```text
 
 Audit Record
 
@@ -408,8 +400,6 @@ SHA-256
 
 Unique Integrity Hash
 
-```
-
 
 
 The hash provides a cryptographic fingerprint of the audit record.
@@ -420,15 +410,11 @@ If the record is changed later, its newly calculated hash will differ from the o
 
 
 
-\---
+⛓️ Blockchain Integrity Verification
 
 
 
-\# ⛓️ Blockchain Integrity Verification
-
-
-
-The Solidity `AuditLog` smart contract stores the integrity proof of the audit event.
+The Solidity AuditLog smart contract stores the integrity proof of the audit event.
 
 
 
@@ -436,21 +422,19 @@ The blockchain record contains:
 
 
 
-\- Event ID
+Event ID
 
-\- SHA-256 hash
+SHA-256 hash
 
-\- Timestamp
+Timestamp
 
-\- Recording address
+Recording address
 
 
 
 The complete audit record remains in MongoDB while the blockchain stores its cryptographic integrity proof.
 
 
-
-```text
 
 MongoDB
 
@@ -466,23 +450,13 @@ Blockchain
 
 Integrity Proof
 
-```
-
-
-
-\---
-
-
-
-\# ⚠️ Tamper Detection
+⚠️ Tamper Detection
 
 
 
 The system detects unauthorized changes to stored audit records.
 
 
-
-```text
 
 Original Audit Record
 
@@ -514,31 +488,15 @@ Mismatch
 
 ⚠️ TAMPERED
 
-```
+✅ Verified Record
 
 
 
-\### Verified Record
+⚠️ Tampered Record
 
 
 
-!\[Verified Event](docs/screenshots/verified-event.png)
-
-
-
-\### Tampered Record
-
-
-
-!\[Tamper Detected](docs/screenshots/tamper-detected.png)
-
-
-
-\---
-
-
-
-\# ☁️ AWS CloudTrail Integration
+☁️ AWS CloudTrail Integration
 
 
 
@@ -546,31 +504,21 @@ AWS CloudTrail provides the cloud activity events used by the auditing system.
 
 
 
-!\[AWS CloudTrail Event](docs/screenshots/AWS-cloudtrail-event.png)
-
-
-
 The captured event contains information such as:
 
 
 
-\- Event name
+Event name
 
-\- Event time
+Event time
 
-\- User
+User
 
-\- Event source
+Event source
 
-\- Resource information
+Resource information
 
-
-
-\---
-
-
-
-\# 🗄️ MongoDB Audit Storage
+🗄️ MongoDB Audit Storage
 
 
 
@@ -578,55 +526,37 @@ Complete audit records are stored in MongoDB Atlas.
 
 
 
-!\[MongoDB Audit Event](docs/screenshots/mongodb-event.png)
-
-
-
 Stored information includes:
 
 
 
-\- Event ID
+Event ID
 
-\- User
+User
 
-\- Action
+Action
 
-\- Resource
+Resource
 
-\- Service
+Service
 
-\- Severity
+Severity
 
-\- SHA-256 hash
+SHA-256 hash
 
-\- Blockchain transaction
+Blockchain transaction
 
-\- Verification status
+Verification status
 
-
-
-\### Verified MongoDB Record
+✅ Verified MongoDB Record
 
 
 
-!\[MongoDB Verified Event](docs/screenshots/mongodb-event-verified.png)
+⚠️ Tampered MongoDB Record
 
 
 
-\### Tampered MongoDB Record
-
-
-
-!\[MongoDB Tampered Event](docs/screenshots/mongodb-event-tamper-detected.png)
-
-
-
-\---
-
-
-
-\# 📊 React Monitoring Dashboard
+📊 React Monitoring Dashboard
 
 
 
@@ -634,49 +564,35 @@ The React dashboard provides a centralized view of cloud audit activity.
 
 
 
-!\[Cloud Resource Audit Dashboard](docs/screenshots/dashboard.png)
+Dashboard provides:
 
+Total Events
 
+Verified Events
 
-\### Dashboard provides:
+Tampered Events
 
+Audit Events
 
+User
 
-\- Total Events
+Action
 
-\- Verified Events
+Resource
 
-\- Tampered Events
+Service
 
-\- Audit Events
+Severity
 
-\- User
+Verification Status
 
-\- Action
-
-\- Resource
-
-\- Service
-
-\- Severity
-
-\- Verification Status
-
-
-
-\---
-
-
-
-\# 🐳 Dockerized Application
+🐳 Dockerized Application
 
 
 
 The application is containerized using Docker and Docker Compose.
 
 
-
-```text
 
 &#x20;                 Docker Compose
 
@@ -698,39 +614,21 @@ The application is containerized using Docker and Docker Compose.
 
 &#x20;         Port 3000          Port 5000
 
-```
-
-
-
-!\[Docker Containers](docs/screenshots/docker-containers.png)
-
 
 
 Run the application using:
 
 
 
-```bash
-
 docker compose up --build
 
-```
-
-
-
-\---
-
-
-
-\# 🤖 GitHub Actions CI
+🤖 GitHub Actions CI
 
 
 
 The project includes a GitHub Actions CI workflow.
 
 
-
-```text
 
 Push / Pull Request
 
@@ -758,55 +656,31 @@ Build Frontend
 
 ✅ CI Success
 
-```
 
 
+🛠️ Technology Stack
 
-!\[GitHub Actions CI](docs/screenshots/github-actions.png)
+Layer	Technology
 
+Cloud	AWS CloudTrail
 
+Frontend	React
 
-\---
+Backend	Node.js, Express
 
+Database	MongoDB Atlas
 
+Blockchain	Solidity, Hardhat, Ethers.js
 
-\# 🛠️ Technology Stack
+Security	SHA-256, JWT, RBAC
 
+Web Server	Nginx
 
+Containerization	Docker, Docker Compose
 
-| Layer | Technology |
+CI	GitHub Actions
 
-|---|---|
-
-| Cloud | AWS CloudTrail |
-
-| Frontend | React |
-
-| Backend | Node.js, Express |
-
-| Database | MongoDB Atlas |
-
-| Blockchain | Solidity, Hardhat, Ethers.js |
-
-| Security | SHA-256, JWT, RBAC |
-
-| Web Server | Nginx |
-
-| Containerization | Docker, Docker Compose |
-
-| CI | GitHub Actions |
-
-
-
-\---
-
-
-
-\# 📂 Project Structure
-
-
-
-```text
+📂 Project Structure
 
 blockchain-cloud-audit/
 
@@ -872,23 +746,9 @@ blockchain-cloud-audit/
 
 └── README.md
 
-```
+🚀 Quick Start
 
-
-
-\---
-
-
-
-\# 🚀 Quick Start
-
-
-
-\## 1. Clone Repository
-
-
-
-```bash
+1\. Clone Repository
 
 git clone <your-github-repository-url>
 
@@ -896,15 +756,7 @@ git clone <your-github-repository-url>
 
 cd blockchain-cloud-audit
 
-```
-
-
-
-\## 2. Backend
-
-
-
-```bash
+2\. Backend
 
 cd backend
 
@@ -912,23 +764,15 @@ npm install
 
 npm start
 
-```
-
 
 
 Backend:
 
 
 
-```text
-
 http://localhost:5000
 
-```
-
-
-
-\## 3. Frontend
+3\. Frontend
 
 
 
@@ -936,15 +780,11 @@ Open another terminal:
 
 
 
-```bash
-
 cd frontend
 
 npm install
 
 npm start
-
-```
 
 
 
@@ -952,19 +792,9 @@ Frontend:
 
 
 
-```text
-
 http://localhost:3000
 
-```
-
-
-
-\## 4. Blockchain
-
-
-
-```bash
+4\. Blockchain
 
 cd blockchain
 
@@ -972,23 +802,15 @@ npm install
 
 npx hardhat node
 
-```
-
 
 
 Deploy the contract:
 
 
 
-```bash
-
 npx hardhat run scripts/deploy.js --network localhost
 
-```
-
-
-
-\## 5. Docker
+5\. Docker
 
 
 
@@ -996,19 +818,9 @@ From the project root:
 
 
 
-```bash
-
 docker compose up --build
 
-```
-
-
-
-\---
-
-
-
-\# 🔒 Security
+🔒 Security
 
 
 
@@ -1020,23 +832,17 @@ The project protects secrets using:
 
 
 
-```text
-
 .gitignore
 
 .dockerignore
 
 Environment Variables
 
-```
-
 
 
 Never commit:
 
 
-
-```text
 
 .env
 
@@ -1050,45 +856,27 @@ MongoDB passwords
 
 API keys
 
-```
+🔮 Future Enhancements
 
+AWS EventBridge + Lambda event-driven integration
 
+Automated SNS security alerts
 
-\---
+PDF/CSV audit reports
 
+CloudWatch monitoring
 
+Advanced security analytics
 
-\# 🔮 Future Enhancements
+Automated security notifications
 
-
-
-\- AWS EventBridge + Lambda event-driven integration
-
-\- Automated SNS security alerts
-
-\- PDF/CSV audit reports
-
-\- CloudWatch monitoring
-
-\- Advanced security analytics
-
-\- Automated security notifications
-
-
-
-\---
-
-
-
-\# 📈 Learning Outcomes
+📈 Learning Outcomes
 
 
 
 This project provided hands-on experience with:
 
 
-
-```text
 
 Cloud Security
 
@@ -1116,27 +904,15 @@ Docker
 
 GitHub Actions
 
-```
-
-
-
-\---
-
-
-
-\# 👩‍💻 Author
-
-
-
 <div align="center">
 
+👩‍💻 Author
+
+Navya Lakshmi Manda
 
 
-\### Navya Lakshmi Manda
 
-
-
-\*\*B.Tech — Computer Science \& Engineering\*\*
+B.Tech — Computer Science \& Engineering
 
 
 
@@ -1144,5 +920,5 @@ Cloud Computing • Cybersecurity • Blockchain • Full Stack Development
 
 
 
-</div>
+</div> ```
 

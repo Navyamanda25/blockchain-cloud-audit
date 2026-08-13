@@ -98,8 +98,8 @@ Production-oriented cloud security architecture built using:
              🔍 Hash Verification
                     │
                     ▼
-             ⚛️ React Dashboard
-
+        ⚛️ React Dashboard
+---
 # 🔥 Why This Project?
 
 Traditional audit records can be modified after they are stored.

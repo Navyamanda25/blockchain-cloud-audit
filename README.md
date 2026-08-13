@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔐 Cloud Security Audit & Blockchain Integrity Platform
+# 🔐 AWS Cloud Security Audit & Blockchain Tamper Detection
 
 ### ☁️ AWS CloudTrail → 🔐 SHA-256 → 🗄️ MongoDB → ⛓️ Blockchain → 🔎 Verification
 
@@ -11,6 +11,7 @@ A cloud security auditing platform that captures AWS cloud activity, generates c
 ![React](https://img.shields.io/badge/React-Frontend-blue)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)
 ![Solidity](https://img.shields.io/badge/Solidity-Smart%20Contract-gray)
+![Hardhat](https://img.shields.io/badge/Hardhat-Blockchain-yellow)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI-black)
 
@@ -51,6 +52,14 @@ Production-oriented cloud security architecture built using:
 - Blockchain transaction tracking
 - Original hash verification
 - Tamper-evident audit records
+
+### 🗄️ Audit Storage
+
+- MongoDB Atlas
+- Complete audit record storage
+- Event metadata tracking
+- Verification status tracking
+- Blockchain transaction tracking
 
 ### 🐳 DevOps & CI
 
@@ -530,18 +539,15 @@ This project provided hands-on experience with:
 - 🤖 GitHub Actions
 
 ---
-
 <div align="center">
 
 # 👩‍💻 Author
 
 ### **Navya Lakshmi Manda**
 
-B.Tech — Computer Science & Engineering
+B.Tech — CSE (Cyber Security, IoT & Blockchain Technology)
 
-☁️ Cloud Computing • 🔐 Cybersecurity • ⛓️ Blockchain • ⚛️ Full Stack Development
-
-**🔐 Built with AWS + Blockchain + Cryptography + MongoDB + React + Docker**
+**AWS Cloud • Cloud Security • Blockchain • Full Stack Development**
 
 ⭐ If you find this project useful, consider giving it a star!
 
